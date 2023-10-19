@@ -1,15 +1,32 @@
-export ZOPEN_GIT_URL="https://github.com/wader/bump.git"
-export ZOPEN_GIT_DEPS="comp_go"
-export ZOPEN_TYPE="GIT"
+export ZOPEN_DEV_URL="https://github.com/wader/bump.git"
+export ZOPEN_DEV_DEPS="comp_go"
+export ZOPEN_BUILD_LINE="DEV"
 
 export ZOPEN_CONFIGURE="skip"
 export ZOPEN_MAKE="go"
-export ZOPEN_MAKE_OPTS="build -o "\$HOME/go/bin/bump" cmd/bump/main.go"
+export ZOPEN_MAKE_OPTS="build -o bump cmd/bump/main.go"
 export ZOPEN_MAKE_MINIMAL="yes"
 export ZOPEN_CHECK="go"
 export ZOPEN_CHECK_OPTS="test -v ./..."
 export ZOPEN_CHECK_MINIMAL="yes"
-export ZOPEN_INSTALL="skip"
+export ZOPEN_INSTALL="zopen_install"
+
+zopen_init()
+{
+  # Go installs binaries, so create the bin dir as well
+  unset CC CXX
+  export CGO_ENABLED=0 # disable C Go as it's not needed in yq
+}
+
+zopen_check()
+{
+  echo "system: zos" > system.yml
+  $GOBIN/yq eval '.age' system.yml | grep -q zos
+  failures=$?
+  echo "actualFailures:$failures"
+  echo "totalTests:1"
+  echo "expectedFailures:0"
+}
 
 zopen_check_results()
 {
@@ -17,25 +34,29 @@ zopen_check_results()
   pfx="$2"
   chk="$1/$2_check.log"
 
+  failures="$(grep -E -c "^not ok" ${chk})"
+  success="$(grep -E -c "^ok" ${chk})"
+
   # Echo the following information to gauge build health
   echo "actualFailures:0"
-  echo "totalTests:1"
-  echo "expectedFailures:0"
-  echo "expectedTotalTests:1"
+  echo "totalTests:$((failures+success))"
+  echo "expectedFailures:${failures}"
 }
 
-zopen_append_to_env()
+zopen_test()
 {
-  # echo envars outside of PATH, MANPATH, LIBPATH
+  go test -v ./...
 }
 
-zopen_append_to_setup()
+zopen_install()
 {
-  # echo commands that will run when installing via setup.sh
+  mkdir -p $ZOPEN_INSTALL_DIR/bin
+  set -e
+  cp bump $ZOPEN_INSTALL_DIR/bin/bump
+  set +e
 }
 
 zopen_get_version()
 {
-  # bump doesn't release versions. It just shows "dev"; so use "1.0.0".
-  echo "1.0.0"
+  echo "1.0.0" # hardcode to 1.0.0 since the version is just "dev"  
 }
