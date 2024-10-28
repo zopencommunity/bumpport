@@ -2,6 +2,7 @@ export ZOPEN_DEV_URL="https://github.com/wader/bump.git"
 export ZOPEN_DEV_DEPS="comp_go"
 export ZOPEN_BUILD_LINE="DEV"
 
+export ZOPEN_CATEGORIES="development"
 export ZOPEN_CONFIGURE="skip"
 export ZOPEN_MAKE="go"
 export ZOPEN_MAKE_OPTS="build -o bump cmd/bump/main.go"
