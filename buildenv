@@ -1,5 +1,5 @@
 export ZOPEN_DEV_URL="https://github.com/wader/bump.git"
-export ZOPEN_DEV_DEPS="comp_go"
+export ZOPEN_DEV_DEPS="check_go"
 export ZOPEN_BUILD_LINE="DEV"
 
 export ZOPEN_CATEGORIES="development"
